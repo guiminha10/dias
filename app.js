@@ -1,0 +1,8 @@
+const SUPABASE_URL='https://bmqvqqwswfbovisvvgpl.supabase.co';
+const SUPABASE_KEY='sb_publishable_0IvfIfD-Xv2wPAshDeN6Gw__bFmh91k';
+const screens=[...document.querySelectorAll('.screen')];
+function go(id){screens.forEach(s=>s.classList.toggle('active',s.id===id));window.scrollTo({top:0,behavior:'smooth'});history.replaceState(null,'','#'+id)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
+const initial=location.hash.slice(1);if(initial&&document.getElementById(initial))go(initial);
+const form=document.getElementById('rsvpForm');
+form.addEventListener('submit',async e=>{e.preventDefault();const btn=document.getElementById('submitBtn'),status=document.getElementById('rsvpStatus');const name=document.getElementById('nome').value.trim();if(!name)return;btn.disabled=true;btn.textContent='Confirmando...';status.className='status hidden';try{const res=await fetch(`${SUPABASE_URL}/rest/v1/rsvps`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({name,guests:Number(document.getElementById('acompanhantes').value||0),phone:document.getElementById('telefone').value.trim()||null,message:document.getElementById('mensagem').value.trim()||null})});if(!res.ok)throw new Error('Falha');form.reset();status.textContent='Presença confirmada com sucesso! Obrigado por responder 💗';status.className='status success'}catch(err){status.textContent='Não foi possível salvar sua confirmação agora. Tente novamente.';status.className='status error'}finally{btn.disabled=false;btn.textContent='Confirmar presença'}});
